@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import connectToDb from "./db";
 import { todosTable } from "./db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { cors } from "hono/cors";
 
 export type Env = {
@@ -22,7 +22,10 @@ app.get("/", (c) => {
 
 app.get("/todos", async (c) => {
   const db = connectToDb(c.env.DATABASE_URL);
-  const todos = await db.select().from(todosTable);
+  const todos = await db
+    .select()
+    .from(todosTable)
+    .orderBy(desc(todosTable.created_at));
   return c.json(todos);
 });
 
